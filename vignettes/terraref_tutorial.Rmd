@@ -1,0 +1,98 @@
+---
+title: "How to Access TERRA REF Data with BrAPI R Package"
+author: "Kristina Riemer"
+output: github_document
+urlcolor: blue
+---
+
+## Sources of information for how to use R package
+
+1. General vignette by maintainer Reinhard Simon, last updated late 2018; [link](https://github.com/CIP-RIU/brapi/blob/master/vignettes/tutorial.Rmd)
+2. TERRA REF-specific vignette by David, recently created as a pull request in the tutorials repo; [link](https://github.com/terraref/tutorials/pull/148/files)
+3. "Official" documentation for functions; [link](https://cip-riu.github.io/brapi/)
+
+## API for working database
+
+URL = https://sweetpotatobase.org/brapi/v1/
+
+## Functions for working database
+####Comes from source #1: 
+
+```{r}
+library(brapi)
+
+sp_base <- ba_db()$sweetpotatobase
+sp_base
+
+ba_show_info(TRUE)
+debugonce(ba_calls)
+ba_calls(sp_base)
+```
+
+This creates the following for a `res` object, and inputs to that function:
+```{shell}
+Browse[2]> res
+Response [https://sweetpotatobase.org/brapi/v1/calls]
+  Date: 2019-11-14 21:21
+  Status: 200
+  Content-Type: application/json
+  Size: 5.07 kB
+  
+Browse[2]> callurl
+[1] "https://sweetpotatobase.org/brapi/v1/calls"
+Browse[2]> con
+Crop = SweetPotato
+
+Addres:Port = sweetpotatobase.org:80
+User = 
+```
+
+## API for TERRA REF data
+
+URL = https://brapi.workbench.terraref.org/brapi/v1/
+
+## Functions not working for TERRA REF data
+####Comes from source #2: 
+
+Are problems coming from the API itself, or the downstream R package? 
+
+```{r}
+library(brapi)
+
+sp_base <- ba_db()$terraref
+sp_base
+
+ba_show_info(TRUE)
+debugonce(ba_calls)
+ba_calls(sp_base)
+
+ba_show_info(FALSE)
+ba_calls(sp_base)
+```
+
+This creates the following for a `res` object:
+```{shell}
+Browse[2]> res
+Response [https://brapi.workbench.terraref.org/brapi/v1/calls]
+  Date: 2019-11-14 21:22
+  Status: 400
+  Content-Type: application/problem+json
+  Size: 246 B
+<BINARY BODY>
+```
+
+
+####Comes from source #2: 
+```{r}
+library(brapi)
+ba_db()
+ba_db()$terraref
+terraref <- ba_db()$terraref
+terraref$db <- gsub('brapi', 'brapi-dev', terraref$db)
+print(ba_calls(terraref))
+ba_studies_details(terraref, '6000000034')
+ba_calls(terraref) #why does this return nothing? 
+ba_crops(terraref) == terraref$crops
+#ba_studies_search(terraref, programDbId = "140")
+```
+
